@@ -1,0 +1,6 @@
+node_modules
+
+# regular expressions in routes 
+#  ? + () * 
+# use of regex in routes /a/ , /a+/, /a?/, /a*/, /a(b|c)/ , /.fly*$/
+# query params in routes /a/:id , /a?id=123

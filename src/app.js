@@ -5,8 +5,13 @@ const User = require('./models/user');
 const validateParams = require('./utils/validations');
 const bcrypt = require('bcrypt');
 const validator = require('validator')
+const jwt = require('jsonwebtoken')
+const cookieParser = require('cookie-parser');
+const { userAuth } = require('./middlewares/auth');
 
 app.use(express.json());
+app.use(cookieParser());  //  used to parse cookie otherwise gets undefined
+app.use(userAuth)
 
 // API - User signup
 app.post('/signup', async (req, res) => {
@@ -59,8 +64,12 @@ app.post('/login', async (req, res) => {
 
     // Compare password with the stored hashed password Using bcrypt
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(401).send('Invalid credentials');
+    if (isPasswordValid) {
+      // Create JWT
+      const token = jwt.sign({ _id: user._id }, 'my@secretKey')
+      res.cookie("token", token)
+    } else {
+      throw new Error('Invalid credentials');
     }
 
     // If login is successful, send a success message
@@ -74,9 +83,9 @@ app.post('/login', async (req, res) => {
 
 // API - GET all users from the database to show on the feed
 app.get('/users', async (req, res) => {
-
   try {
-    const users = await User.find({})
+    const email = req.params.email
+    const users = await User.find({ email })
     if (users.length == 0) {
       return res.status(404).send('No users found');
     } else {

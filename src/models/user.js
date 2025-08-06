@@ -76,11 +76,13 @@ const userSchema = new mongoose.Schema({
 
 userSchema.methods.getJWT = async function () {
     const user = this
+    // Create Token
     const token = await jwt.sign({ _id: user._id }, 'my@secretKey', { expiresIn: '1d' })
     return token
 }
 
-userSchema.methods.validatePassword = async function(passwordByUser){
+// Compare password with the stored hashed password Using bcrypt
+userSchema.methods.validatePassword = async function (passwordByUser) {
     const user = this
     const isPasswordValid = await bcrypt.compare(passwordByUser, user.password)
     return isPasswordValid

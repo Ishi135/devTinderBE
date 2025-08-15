@@ -1,4 +1,4 @@
-const validateParams = require('./');
+const validations = require('../utils/validations');
 const bcrypt = require('bcrypt');
 const validator = require('validator')
 const User = require('../models/user');
@@ -7,7 +7,7 @@ const User = require('../models/user');
 const signup = async (req, res) => {
   // Validate request body
   try {
-    const invalidParam = validateParams(req);
+    const invalidParam = validations.validateSignUpData(req);
     if (invalidParam) {
       throw {
         message: invalidParam
@@ -28,7 +28,6 @@ const signup = async (req, res) => {
     res.send('User signed up successfully')
   }
   catch (err) {
-    console.error(err);
     res.status(500).send('Error : ' + (err.message || err));
   }
 }
@@ -68,7 +67,19 @@ const login = async (req, res) => {
   }
 }
 
+const logout = async (req, res) => {
+  try {
+    res.cookie("token", null, {
+      expires: new Date(Date.now())
+    }).send("User Logged out successfully")
+  }
+  catch {
+    res.status(400).send('Error logging out: ' + (err.message || err));
+  }
+}
+
 module.exports = {
   signup,
-  login
+  login,
+  logout
 }

@@ -4,14 +4,14 @@ const connectDb = require('./config/database')
 const cookieParser = require('cookie-parser');
 const authRouter = require('./routes/auth')
 const profileRouter = require('./routes/profile')
-// const requestRouter = require('./routes/auth')
+const requestRouter = require('./routes/requests')
 
 app.use(express.json());  //  used to parse request body
 app.use(cookieParser());  //  used to parse cookie otherwise gets undefined
 
 app.use('/', authRouter)
 app.use('/', profileRouter)
-// app.use('/', requestRouter)
+app.use('/', requestRouter)
 
 app.use('/', (err, req, res, next) => {
   res.status(500).send('Something went wrong!');

@@ -1,4 +1,6 @@
 const validations = require('../utils/validations');
+const validator = require("validator")
+const bcrypt = require("bcrypt")
 
 const viewProfile = async (req, res) => {
   try {
@@ -38,8 +40,9 @@ const editPassword = async (req, res) => {
     const passwordHash = await bcrypt.hash(newPassword, 10)
     user.password = passwordHash
     user.save()
-    res.cookie("token", null)
-    res.json({ data: user, message: `${user.firstName}, your password has been updated successfully` })
+    res.cookie("token", null, {
+      expires: new Date(Date.now())
+    }).send("your password has been updated successfully")
   }
   catch (err) {
     res.status(400).send('Error : ' + (err.message || err))

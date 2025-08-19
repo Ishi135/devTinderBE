@@ -43,12 +43,16 @@ const userSchema = new mongoose.Schema({
     },
     gender: {
         type: String,
-        required: false,
-        validate(value) {
-            if (![male, female, other].includes(value)) {
-                throw new Error('Invalid gender')
-            }
-        }
+        enum: {
+            values: ['male', 'female', 'other'],
+            message: '{VALUE} is not a gender'
+        },
+        // required: false,
+        // validate(value) {
+        //     if (![male, female, other].includes(value)) {
+        //         throw new Error('Invalid gender')
+        //     }
+        // }
 
     },
     photoUrl: {
@@ -73,6 +77,8 @@ const userSchema = new mongoose.Schema({
 },
     { timestamps: true } // This will add createdAt and updatedAt fields
 )
+
+userSchema.index({ firstName: 1, lastName: 1 })
 
 userSchema.methods.getJWT = async function () {
     const user = this

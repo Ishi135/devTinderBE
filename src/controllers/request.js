@@ -1,5 +1,6 @@
 const ConnectionRequest = require("../models/connections")
 const User = require("../models/user")
+const { requestStatus } = require('../constants')
 
 const sendRequest = async (req, res) => {
   try {
@@ -10,7 +11,7 @@ const sendRequest = async (req, res) => {
     if (!toUser) {
       return res.status(400).send('User not found');
     }
-    const allowedStatus = ['ignore', 'interested']
+    const allowedStatus = [requestStatus.ignore, requestStatus.interested]
     if (!allowedStatus.includes(status))
       return res.status(400).json({
         message: 'Invalid status'
@@ -46,6 +47,28 @@ const sendRequest = async (req, res) => {
   }
 }
 
+const reviewRequest = async (req, res) => {
+  try {
+    const loggedInUser = req.user
+    const { status, requestId } = req.params
+
+    const allowedStatus = ['accepted', 'rejected']
+    if (!allowedStatus.includes(status)) {
+      throw new Error('Status is not valid')
+    }
+    const connectionRequest = await ConnectionRequest.findOne({ _id: requestId, toUserId: loggedInUser._id, status: "interested" })
+    if (!connectionRequest)
+      return res.status(400).json({ message: 'connection Request is not found' })
+    connectionRequest.status = status
+    const data = await connectionRequest.save()
+    res.json({ data, message: 'Connection Request ' + status })
+  }
+  catch (err) {
+    res.status(400).send('ERROR ' + (err.message || err))
+  }
+}
+
 module.exports = {
-  sendRequest
+  sendRequest,
+  reviewRequest
 }

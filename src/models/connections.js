@@ -1,21 +1,22 @@
 // enum helps to restrict the values of the status field to only 'ignore', 'accepted', or 'rejected'.
-const { default: mongoose } = require('mongoose')
-const moongose = require('mongoose')
+const mongoose = require('mongoose')
+const { requestStatus } = require('../constants')
 
-const connectionSchema = new moongose.Schema({
+const connectionSchema = new mongoose.Schema({
   fromUserId: {
-    type: moongose.Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true,
   },
   toUserId: {
-    type: moongose.Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
   status: {
     type: String,
     required: true,
     enum: {
-      values: ['ignore', 'interested', 'accepted', 'rejected'],
+      values: Object.values(requestStatus),
       message: '{VALUE} is not a valid status'
     }
   }
